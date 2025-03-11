@@ -67,21 +67,21 @@ Classification Report: Strong precision and recall across AQI categories
 
 **How to Get Started**
 
--> Clone the repository from GitHub.
+1. Clone the repository from GitHub.
 
 *Example:* Download the project files to your local system.
 
--> Navigate to the project folder on your local system.
+2. Navigate to the project folder on your local system.
 
--> Install the required dependencies for running the project.
+3. Install the required dependencies for running the project.
 
 *Example:* Install necessary libraries like Pandas, NumPy, and Scikit-learn.
 
--> Run the script to analyze and predict air quality.
+4. Run the script to analyze and predict air quality.
 
 *Example:* Execute the Python file to process the dataset and train models.
 
--> View the output and visualizations to interpret AQI trends.
+5. View the output and visualizations to interpret AQI trends.
 
 Example: Graphs showing air pollution levels over time will be displayed.
 
