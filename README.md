@@ -5,20 +5,10 @@
 *This project analyzes and predicts Air Quality Index (AQI) using machine learning.*
 It employs:
 
-*Linear Regression* – To predict exact AQI values.
+**Linear Regression** – To predict exact AQI values.
 
-*Random Forest Classification* – To classify AQI into categories (Good, Moderate, Poor, etc.).
+**Random Forest Classification** – To classify AQI into categories (Good, Moderate, Poor, etc.).
 Dataset
-
- **Why the Project Is Useful?**
- 
--> Environmental Monitoring: Helps in tracking pollution levels.
-
--> Health Awareness: Identifies areas with unsafe air quality.
-
--> Policy Making: Assists governments in taking preventive measures.
-
--> Predictive Analysis: Allows forecasting of AQI trends for better planning.
 
 **The dataset includes air quality measurements with features such as:**
 
@@ -74,3 +64,35 @@ Target: AQI_Bucket
 Accuracy: 88.5%
 
 Classification Report: Strong precision and recall across AQI categories
+
+**How to Get Started**
+
+-> Clone the repository from GitHub.
+
+*Example:* Download the project files to your local system.
+
+-> Navigate to the project folder on your local system.
+
+-> Install the required dependencies for running the project.
+
+*Example:* Install necessary libraries like Pandas, NumPy, and Scikit-learn.
+
+-> Run the script to analyze and predict air quality.
+
+*Example:* Execute the Python file to process the dataset and train models.
+
+-> View the output and visualizations to interpret AQI trends.
+
+Example: Graphs showing air pollution levels over time will be displayed.
+
+
+ **Why the Project Is Useful?**
+ 
+-> Environmental Monitoring: Helps in tracking pollution levels.
+
+-> Health Awareness: Identifies areas with unsafe air quality.
+
+-> Policy Making: Assists governments in taking preventive measures.
+
+-> Predictive Analysis: Allows forecasting of AQI trends for better planning.
+
