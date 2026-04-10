@@ -1,4 +1,4 @@
-# 🌫️ Air Quality Prediction
+# Air Quality Prediction
 
 > Predict AQI values and classify air quality categories across Indian cities using machine learning — with feature engineering, SMOTE balancing, hyperparameter tuning, ensemble methods, and SHAP explainability.
 
