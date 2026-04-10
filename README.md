@@ -118,32 +118,6 @@ Raw Data (3349 rows, 9 cols)
 
 ## Models & Results
 
-### Regression (AQI prediction)
-
-| Model | Mean R² |
-|---|---|
-| XGBoost | ~0.994 |
-| LightGBM | — |
-| Random Forest | — |
-| Linear Regression | — |
-| Stacking Ensemble | — |
-| **Baseline (mean)** | **–0.005** |
-
-> Best model achieves R² ≈ 0.9942 with MAE ≈ 4.3 on training data. A proper train/test split is recommended for unbiased estimates — see [Known Issues](#known-issues--fixes).
-
-### Classification (AQI category)
-
-| Model | CV Accuracy | Std Dev |
-|---|---|---|
-| **Voting Ensemble** | **95.67%** | ±0.70% |
-| XGBoost (Tuned) | 95.66% | ±0.66% |
-| LightGBM | 95.60% | ±0.60% |
-| Random Forest | 95.41% | ±0.85% |
-| XGBoost | 95.03% | ±0.71% |
-| **Baseline (majority)** | **41.06%** | — |
-
-Cross-validation was run on SMOTE-balanced data with `StratifiedKFold(n_splits=5)`.
-
 **GridSearchCV best parameters (XGBoost):**
 ```
 colsample_bytree : 0.8
