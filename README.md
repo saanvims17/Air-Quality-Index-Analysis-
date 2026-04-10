@@ -6,7 +6,6 @@
 ![Scikit-learn](https://img.shields.io/badge/scikit--learn-latest-orange?logo=scikit-learn&logoColor=white)
 ![XGBoost](https://img.shields.io/badge/XGBoost-latest-red)
 ![LightGBM](https://img.shields.io/badge/LightGBM-latest-green)
-![License](https://img.shields.io/badge/license-MIT-blue)
 
 ---
 ## Overview
