@@ -1,98 +1,258 @@
-# Air-Quality-Index-Analysis-
+# 🌫️ Air Quality Prediction
 
-**Project Overview**
+> Predict AQI values and classify air quality categories across Indian cities using machine learning — with feature engineering, SMOTE balancing, hyperparameter tuning, ensemble methods, and SHAP explainability.
 
-*This project analyzes and predicts Air Quality Index (AQI) using machine learning.*
-It employs:
+![Python](https://img.shields.io/badge/Python-3.13-blue?logo=python&logoColor=white)
+![Scikit-learn](https://img.shields.io/badge/scikit--learn-latest-orange?logo=scikit-learn&logoColor=white)
+![XGBoost](https://img.shields.io/badge/XGBoost-latest-red)
+![LightGBM](https://img.shields.io/badge/LightGBM-latest-green)
+![License](https://img.shields.io/badge/license-MIT-blue)
 
-**Linear Regression** – To predict exact AQI values.
+---
+## Overview
 
-**Random Forest Classification** – To classify AQI into categories (Good, Moderate, Poor, etc.).
-Dataset
+This project tackles air quality prediction as two parallel problems:
 
-**The dataset includes air quality measurements with features such as:**
+| Task | Target | Metric |
+|---|---|---|
+| **Regression** | AQI (continuous, 0–600+) | R² score |
+| **Classification** | AQI Bucket (Good → Severe) | Accuracy |
 
--> Pollutants: PM2.5, PM10, NO2, SO2, O3
+Data covers five Indian cities — **Delhi, Kolkata, Mumbai, Chandigarh, and Bengaluru** — with daily pollutant readings across 3,349 records.
 
--> AQI: Numeric target for regression
+Key techniques applied:
+- **Feature engineering** — 5 interaction features derived from raw pollutants
+- **SMOTE** — oversampling to fix severe class imbalance (Severe: 61 vs Moderate: 1,375)
+- **GridSearchCV** — 108-combination hyperparameter search for XGBoost
+- **Soft Voting Ensemble** — RF + Tuned XGBoost + LightGBM combined
+- **SHAP** — TreeExplainer to identify per-feature impact on each prediction
 
--> AQI_Bucket: Categorical target for classification
+---
 
-**Technologies Used**
+## Dataset
 
--> Python
+**File:** `air_quality_data.csv`
 
--> Pandas, NumPy – Data handling
+| Column | Type | Description |
+|---|---|---|
+| `City` | string | One of 5 Indian cities |
+| `Date` | date | Daily reading |
+| `PM2.5` | float | Fine particulate matter (µg/m³) |
+| `PM10` | float | Coarse particulate matter (µg/m³) |
+| `NO2` | float | Nitrogen dioxide (µg/m³) |
+| `SO2` | float | Sulfur dioxide (µg/m³) |
+| `O3` | float | Ozone (µg/m³) |
+| `AQI` | float | Air Quality Index (target for regression) |
+| `AQI_Bucket` | string | Category label (target for classification) |
 
--> Matplotlib, Seaborn – Data visualization
+**Class distribution (before SMOTE):**
 
--> Scikit-learn – Machine learning models
+```
+Moderate      1375
+Satisfactory  1128
+Good           319
+Poor           308
+Very Poor      158
+Severe          61
+```
 
-**Project Workflow**
+Missing values (6 per column) are filled with column means; missing `AQI_Bucket` labels are derived from AQI thresholds.
 
-**Data Preprocessing**
+---
 
--> Handled missing values using mean imputation.
+## Project Structure
 
--> Encoded AQI categories into numerical labels.
+```
+air_quality/
+│
+├── air_quality_data.csv          # Raw dataset
+├── air_quality_final.ipynb       # Main notebook
+├── requirements.txt              # Dependencies
+└── README.md
+```
 
--> Split data into training and testing sets.
+---
 
-**Model 1: Linear Regression (AQI Prediction)**
+## Pipeline
 
-Features: PM2.5, PM10, NO2, SO2, O3
+```
+Raw Data (3349 rows, 9 cols)
+        │
+        ▼
+  Data Cleaning
+  (mean imputation, bucket fill, drop City/Date)
+        │
+        ▼
+  Feature Engineering
+  (5 raw → 10 total features)
+        │
+        ├──────────────────────────────┐
+        ▼                              ▼
+  REGRESSION                    CLASSIFICATION
+  Target: AQI (continuous)      Target: AQI_Bucket (6 classes)
+        │                              │
+        │                         SMOTE balancing
+        │                         (3349 → 8250 samples)
+        │                              │
+        ▼                              ▼
+  Cross-Validation               GridSearchCV (XGBoost)
+  (Linear Reg, RF,               + Soft Voting Ensemble
+   XGBoost, LightGBM,            (RF + XGBoost + LightGBM)
+   Stacking)
+        │                              │
+        ▼                              ▼
+  Best Model Evaluation         Best Model Evaluation
+  + SHAP Explainability         + Confusion Matrix
+```
 
-Target: AQI
+### Engineered Features
 
-**Performance:**
+| Feature | Formula | Rationale |
+|---|---|---|
+| `PM_total` | PM2.5 + PM10 | Total particulate load |
+| `gas_total` | NO2 + SO2 + O3 | Total gas pollutants |
+| `PM_gas_ratio` | PM_total / (gas_total + 1) | Particulate vs gas balance |
+| `PM2.5_PM10_ratio` | PM2.5 / (PM10 + 1) | Fine vs coarse particle ratio |
+| `NO2_O3_ratio` | NO2 / (O3 + 1) | Photochemical activity proxy |
 
-R² Score: 0.935 (93.5% accuracy)
+---
 
-Mean Absolute Error: 16.25
+## Models & Results
 
-Root Mean Squared Error: 22.53
+### Regression (AQI prediction)
 
+| Model | Mean R² |
+|---|---|
+| XGBoost | ~0.994 |
+| LightGBM | — |
+| Random Forest | — |
+| Linear Regression | — |
+| Stacking Ensemble | — |
+| **Baseline (mean)** | **–0.005** |
 
-**Model 2: Random Forest Classification (AQI Category Prediction)**
+> Best model achieves R² ≈ 0.9942 with MAE ≈ 4.3 on training data. A proper train/test split is recommended for unbiased estimates — see [Known Issues](#known-issues--fixes).
 
-Features: PM2.5, PM10, NO2, SO2, O3
+### Classification (AQI category)
 
-Target: AQI_Bucket
+| Model | CV Accuracy | Std Dev |
+|---|---|---|
+| **Voting Ensemble** | **95.67%** | ±0.70% |
+| XGBoost (Tuned) | 95.66% | ±0.66% |
+| LightGBM | 95.60% | ±0.60% |
+| Random Forest | 95.41% | ±0.85% |
+| XGBoost | 95.03% | ±0.71% |
+| **Baseline (majority)** | **41.06%** | — |
 
-**Performance:**
+Cross-validation was run on SMOTE-balanced data with `StratifiedKFold(n_splits=5)`.
 
-Accuracy: 88.5%
+**GridSearchCV best parameters (XGBoost):**
+```
+colsample_bytree : 0.8
+learning_rate    : 0.1
+max_depth        : 7
+n_estimators     : 300
+subsample        : 0.8
+Best CV accuracy : 95.66%
+```
 
-Classification Report: Strong precision and recall across AQI categories
+---
 
-**How to Get Started**
+## SHAP Explainability
 
-1. Clone the repository from GitHub.
+SHAP (SHapley Additive exPlanations) was used to explain the best regression model's predictions.
 
-*Example:* Download the project files to your local system.
+**Top features by mean absolute SHAP value:**
 
-2. Navigate to the project folder on your local system.
+| Rank | Feature | Impact |
+|---|---|---|
+| 1 | PM2.5 | Highest — strong positive driver |
+| 2 | PM_total | High — engineered feature validates well |
+| 3 | PM10 | Moderate positive |
+| 4 | PM_gas_ratio | Moderate |
+| 5 | SO2 | Low positive |
 
-3. Install the required dependencies for running the project.
+Key insight: **PM2.5 and PM_total together dominate AQI prediction**, confirming that particulate matter (not gas pollutants like O3 or NO2) is the primary air quality driver in this dataset. The engineered `PM_total` feature adds genuine predictive signal beyond PM2.5 alone.
 
-*Example:* Install necessary libraries like Pandas, NumPy, and Scikit-learn.
+---
 
-4. Run the script to analyze and predict air quality.
+## Installation
 
-*Example:* Execute the Python file to process the dataset and train models.
+```bash
+# Clone the repository
+git clone https://github.com/your-username/air-quality-prediction.git
+cd air-quality-prediction
 
-5. View the output and visualizations to interpret AQI trends.
+# Create a virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-Example: Graphs showing air pollution levels over time will be displayed.
+# Install dependencies
+pip install -r requirements.txt
+```
 
+**`requirements.txt`**
+```
+pandas
+numpy
+matplotlib
+seaborn
+scikit-learn
+imbalanced-learn
+xgboost
+lightgbm
+shap
+jupyter
+```
 
- **Why the Project Is Useful?**
- 
--> Environmental Monitoring: Helps in tracking pollution levels.
+---
 
--> Health Awareness: Identifies areas with unsafe air quality.
+## Usage
 
--> Policy Making: Assists governments in taking preventive measures.
+```bash
+# Launch the notebook
+jupyter notebook air_quality_final.ipynb
+```
 
--> Predictive Analysis: Allows forecasting of AQI trends for better planning.
+Run cells in order. The notebook is self-contained — data loading, cleaning, feature engineering, training, and evaluation all run sequentially.
 
+---
+
+## Known Issues & Fixes
+
+### 1. `KeyError: 'Mean'` in Final Summary cell
+The summary cell references `clf_results['Mean']` but the column is stored as `'Mean Accuracy'`.
+
+**Fix:**
+```python
+# Change this:
+best_acc = clf_results[...]['Mean'].max()
+
+# To this:
+best_acc = clf_results[~clf_results['Model'].str.contains('Baseline')]['Mean Accuracy'].max()
+```
+
+### 2. `NameError: StackingRegressor` not imported
+`StackingRegressor` is used in the regression model definitions but missing from imports.
+
+**Fix:** Add to the imports cell:
+```python
+from sklearn.ensemble import StackingRegressor
+```
+
+### 3. Evaluation on training data (data leakage)
+The confusion matrix and classification report are generated by predicting on the same data the model was trained on, producing an artificially perfect 1.00 score across all classes.
+
+## Future Improvements
+
+- Add a proper 80/20 train/test split for unbiased evaluation
+- Apply SMOTE inside cross-validation folds using `Pipeline` + `imblearn`
+- Include temporal features (month, season) to capture pollution seasonality
+- Add city as a one-hot encoded feature instead of dropping it
+- Deploy best model as a REST API (FastAPI or Flask)
+- Build an interactive dashboard for real-time AQI prediction
+
+---
+
+## License
+
+This project is licensed under the MIT License.
