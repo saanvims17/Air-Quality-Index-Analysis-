@@ -200,7 +200,3 @@ Run cells in order. The notebook is self-contained — data loading, cleaning, f
 - Build an interactive dashboard for real-time AQI prediction
 
 ---
-
-## License
-
-This project is licensed under the MIT License.
